@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: ab35f3c12498b66478d077f09214f55d
+guid: ba24f8a20c1b0ae429826202c6ffc775
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -45,12 +45,12 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 100
-  spriteBorder: {x: 91, y: 0, z: 56, w: 17}
-  spriteGenerateFallbackPhysicsShape: 0
+  spritePixelsToUnits: 400
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
   alphaIsTransparency: 1
-  spriteTessellationDetail: 0.53
+  spriteTessellationDetail: -1
   textureType: 8
   textureShape: 1
   singleChannelComponent: 0
@@ -69,7 +69,7 @@ TextureImporter:
     allowsAlphaSplitting: 0
     overridden: 0
     androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 1
+    forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 3
     buildTarget: Standalone
     maxTextureSize: 2048
@@ -81,40 +81,14 @@ TextureImporter:
     allowsAlphaSplitting: 0
     overridden: 0
     androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 1
+    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
     sprites: []
-    outline:
-    - - {x: 122, y: 278.5}
-      - {x: 66, y: 285.5}
-      - {x: 28, y: 262.5}
-      - {x: 1, y: 232.5}
-      - {x: -12, y: 210.5}
-      - {x: -23, y: 209.5}
-      - {x: -43, y: 231.5}
-      - {x: -106, y: 245.5}
-      - {x: -154, y: 227.5}
-      - {x: -169, y: 179.5}
-      - {x: -155, y: 142.5}
-      - {x: -190, y: 93.5}
-      - {x: -239, y: -40.5}
-      - {x: -239, y: -127.5}
-      - {x: -227, y: -185.5}
-      - {x: -238, y: -300.5}
-      - {x: 277, y: -300.5}
-      - {x: 247, y: -221.5}
-      - {x: 264, y: -174.5}
-      - {x: 270, y: -117.5}
-      - {x: 258, y: -33.5}
-      - {x: 225, y: 55.5}
-      - {x: 176, y: 136.5}
-      - {x: 139, y: 165.5}
-      - {x: 166, y: 201.5}
-      - {x: 153, y: 249.5}
+    outline: []
     physicsShape: []
     bones: []
-    spriteID: 880ef445d040b3e43a57d3c935b37e57
+    spriteID: 5e97eb03825dee720800000000000000
     internalID: 0
     vertices: []
     indices: 

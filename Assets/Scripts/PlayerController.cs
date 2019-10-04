@@ -8,15 +8,17 @@ public class PlayerController : MonoBehaviour
 	private float RAYCASTDOWNDIST = 0.8f;
 
 	private const float ACCELX = 50;
+	private const float ACCELSLOWDOWN = 120;
+	private const float STOPTHRESH = 1;
 	private const float MAXSPEEDX = 10;
 	private const float INPUTTOL = 0.0f;
-	private const float BASEJUMPFORCE = 250;
-	private const float JUMPFORCEINC = 150;
-	private const float JUMPSQUATFRAMES = 4;
+
+
 	
     private Rigidbody2D playerBody;
 	private SpriteRenderer playerSprite;
-	
+
+	private Animator playerAnimator;
 	//Player inputs
 	private float inputHorz;
 	private float inputVert;
@@ -24,9 +26,22 @@ public class PlayerController : MonoBehaviour
 	private bool inputJumpUp;
 	private bool inputJumpHeld;
 
+	// Jumping stuff
 	private float jumpForce;
 	private int jumpSquatCounter;
 	private bool jumpPressed;
+	private const float BASEJUMPFORCE = 250;
+	private const float JUMPFORCEINC = 150;
+	private const int JUMPSQUATFRAMES = 4;
+
+	//Turning stuff
+	private bool isTurning = false;
+	private int turningCounter;
+	private const int TURNINGFRAMES = 10;
+	
+	[SerializeField]
+	private GameObject turnClouds;
+
 
 	//Basic states
 	private bool isMoving;
@@ -35,6 +50,7 @@ public class PlayerController : MonoBehaviour
 	private bool isMovingDown;
 	private bool isInputLeft;
 	private bool isInputRight;
+	private bool isFacingRight = true;
 
 	//Combo states
 	private bool isJumping;
@@ -46,6 +62,7 @@ public class PlayerController : MonoBehaviour
     {
         playerBody = GetComponent<Rigidbody2D>();
 		playerSprite = GetComponent<SpriteRenderer>();
+		playerAnimator = GetComponent<Animator>();
     }
 
     // Update is called once per frame
@@ -59,18 +76,35 @@ public class PlayerController : MonoBehaviour
 
 	void UpdatePhysics()
 	{	
-		if(isInputLeft)
+		if(isInputLeft || isInputRight)
 		{
-			playerBody.AddForce(transform.TransformDirection(Vector3.left) * ACCELX);
+			if((isFacingRight && isInputLeft) || (!isFacingRight && isInputRight))
+			{
+				Vector3 newScale = transform.localScale;
+				newScale.x = -transform.localScale.x;
+				transform.localScale = newScale;
+				isFacingRight = !isFacingRight;
+				if(Mathf.Abs(playerBody.velocity.x) > STOPTHRESH)
+				{
+					isTurning = true;
+					turningCounter = 0;
+				}
+			}
+			playerBody.AddForce(transform.right * Mathf.Sign(transform.localScale.x) * ACCELX);
 		}
-		else if(isInputRight)
+		else 
 		{
-			playerBody.AddForce(transform.TransformDirection(Vector3.right) * ACCELX);
+			if(Mathf.Abs(playerBody.velocity.x) <= STOPTHRESH)
+			{
+				playerBody.velocity = new Vector2(0, playerBody.velocity.y);
+			}
+			else
+			{
+				playerBody.AddForce(new Vector2 (Mathf.Sign(playerBody.velocity.x), 0) * -ACCELSLOWDOWN);
+			}
+
 		}
-		else if(isGrounded)
-		{
-			playerBody.velocity = new Vector2(0, playerBody.velocity.y);	
-		}
+		
 		if (Mathf.Abs(playerBody.velocity.x) > MAXSPEEDX)
         {
             playerBody.velocity = new Vector2(MAXSPEEDX * Mathf.Sign(playerBody.velocity.x), playerBody.velocity.y);
@@ -87,7 +121,14 @@ public class PlayerController : MonoBehaviour
 		{	
 			if (jumpSquatCounter < JUMPSQUATFRAMES)
 			{
-				jumpForce += JUMPFORCEINC;
+				if(isTurning)
+				{
+					jumpForce += JUMPFORCEINC*1.5f;
+				}
+				else
+				{
+					jumpForce += JUMPFORCEINC;
+				}
 				jumpSquatCounter++;
 			}
 			else if(jumpPressed)
@@ -178,17 +219,39 @@ public class PlayerController : MonoBehaviour
 
 	void UpdateAnim()
 	{
-		if(isInputRight)
+		foreach(AnimatorControllerParameter param in playerAnimator.parameters)
 		{
-			playerSprite.flipX = true;
+			if(param.type == AnimatorControllerParameterType.Bool)
+			{
+				playerAnimator.SetBool(param.name, false);
+			}
 		}
 
-		if(isInputLeft)
+		if(isGrounded && (isInputRight || isInputLeft) && !isTurning)
 		{
-			playerSprite.flipX = false;
+			playerAnimator.SetBool("running", true);
+			playerAnimator.SetFloat("runningSpeed", Mathf.Abs(playerBody.velocity.x)/MAXSPEEDX);
 		}
-
-
+		else if(isTurning)
+		{
+			playerAnimator.SetBool("turning", true);
+			turningCounter++;
+			if(isGrounded && turningCounter == (int)TURNINGFRAMES/2)
+			{
+				Vector3 cloudsPosition = transform.position;
+				cloudsPosition.x = cloudsPosition.x - 0.8f * Mathf.Sign(transform.localScale.x);
+				cloudsPosition.y = cloudsPosition.y - 0.15f;
+				GameObject.Instantiate(turnClouds, cloudsPosition, transform.rotation);
+			}
+			if(turningCounter == TURNINGFRAMES)
+			{
+				isTurning = false;
+			}
+		}
+		else
+		{
+			playerAnimator.SetBool("idle", true);
+		}
 	}
 
 	bool RayCastGround(float offset)
